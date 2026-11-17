@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 const weddingDate = new Date("2026-12-11T09:00:00+05:30");
@@ -27,7 +27,7 @@ function MusicButton() {
     window.addEventListener("start-wedding-music", beginMusic);
     return () => window.removeEventListener("start-wedding-music", beginMusic);
   }, []);
-  useEffect(() => { if (!audio.current) return; if (playing) audio.current.play().catch(() => setPlaying(false)); else audio.current.pause(); localStorage.setItem("wedding-music", playing ? "on" : "off"); }, [playing]);
+  useEffect(() => { if (!audio.current) return; if (playing && audio.current.paused) audio.current.play().catch(() => setPlaying(false)); else if (!playing) audio.current.pause(); localStorage.setItem("wedding-music", playing ? "on" : "off"); }, [playing]);
   return <><audio ref={audio} src="/wedding-music.mp3" loop preload="none" /><button className={`music ${playing ? "playing" : ""}`} onClick={() => setPlaying(v => !v)} aria-label={playing ? "Mute wedding music" : "Play wedding music"}><span>♫</span><small>{playing ? "Music on" : "Music off"}</small></button></>;
 }
 
@@ -98,12 +98,15 @@ function Rsvp() {
     <label>Message <small>optional</small><textarea name="message" maxLength={500} rows={3} placeholder="Leave a note for the couple" /></label>
     {status === "error" && <p className="error" role="alert">We couldn’t save your response. Please try again.</p>}
     <button className="gold-button" disabled={status === "sending"}>{status === "sending" ? "Sending…" : "Send RSVP"}<span>→</span></button>
-  </form>{status === "done" && typeof document !== "undefined" && createPortal(<div className="experience rsvp-modal-root"><div className="rsvp-success-overlay" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setStatus("idle"); }}><div className="rsvp-success" role="dialog" aria-modal="true" aria-labelledby="rsvp-success-title"><img className="popup-mandala popup-mandala-top" src="/rotating-gold-mandala.png" alt="" aria-hidden="true"/><img className="popup-mandala popup-mandala-bottom" src="/rotating-gold-mandala.png" alt="" aria-hidden="true"/><button className="success-close" type="button" onClick={() => setStatus("idle")} aria-label="Close response confirmation">×</button><i aria-hidden="true">✓</i><p className="kicker">Response received</p><h3 id="rsvp-success-title">With all our love, thank you.</h3><p>{attendance === "joyfully accepts" ? "We cannot wait to celebrate our special day with you" : "You will be close in our hearts on our special day."}</p><button ref={editResponseButton} className="edit-response" type="button" onClick={() => setStatus("idle")}>Edit response</button></div></div></div>, document.body)}</>;
+  </form>{status === "done" && typeof document !== "undefined" && createPortal(<div className="experience rsvp-modal-root"><div className="rsvp-success-overlay" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setStatus("idle"); }}><div className="rsvp-success" role="dialog" aria-modal="true" aria-labelledby="rsvp-success-title"><img className="popup-mandala popup-mandala-top" src="/rotating-gold-mandala.png" width={1266} height={1242} decoding="async" alt="" aria-hidden="true"/><img className="popup-mandala popup-mandala-bottom" src="/rotating-gold-mandala.png" width={1266} height={1242} decoding="async" alt="" aria-hidden="true"/><button className="success-close" type="button" onClick={() => setStatus("idle")} aria-label="Close response confirmation">×</button><i aria-hidden="true">✓</i><p className="kicker">Response received</p><h3 id="rsvp-success-title">With all our love, thank you.</h3><p>{attendance === "joyfully accepts" ? "We cannot wait to celebrate our special day with you" : "You will be close in our hearts on our special day."}</p><button ref={editResponseButton} className="edit-response" type="button" onClick={() => setStatus("idle")}>Edit response</button></div></div></div>, document.body)}</>;
 }
 
 export default function Home() {
   const [stage, setStage] = useState<"sealed" | "opening" | "card" | "book">("sealed"); const [page, setPage] = useState(0);
+  const [celebrationLoaded, setCelebrationLoaded] = useState(false);
+  const openCelebration = () => { setCelebrationLoaded(true); setPage(1); };
   const openingStarted = useRef(false);
+  const coverCueVisible = useRef(false);
   const openEnvelope = () => { if (openingStarted.current) return; openingStarted.current = true; window.dispatchEvent(new Event("start-wedding-music")); setStage("opening"); };
   useEffect(() => {
     if (stage !== "opening") return;
@@ -111,9 +114,18 @@ export default function Home() {
     return () => window.clearTimeout(timer);
   }, [stage]);
   useEffect(() => {
+    if (stage !== "book" || page !== 0) return;
+    const cue = document.querySelector(".scroll-next");
+    if (!cue) return;
+    const observer = new IntersectionObserver(([entry]) => { coverCueVisible.current = entry.isIntersecting && entry.intersectionRatio >= .99; }, { threshold: .99 });
+    observer.observe(cue);
+    return () => { observer.disconnect(); coverCueVisible.current = false; };
+  }, [stage, page]);
+  useLayoutEffect(() => {
     if (stage !== "book" || page === 0) return;
+    window.scrollTo({ top: 0, behavior: "instant" });
     const sections = Array.from(document.querySelectorAll<HTMLElement>(".continuous-view .scroll-section"));
-    const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add("in-view"); }), { threshold: .06, rootMargin: "0px 0px 6% 0px" });
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => { entry.target.classList.toggle("motion-visible", entry.isIntersecting); if (entry.isIntersecting) entry.target.classList.add("in-view"); }), { threshold: .06, rootMargin: "0px 0px 6% 0px" });
     sections.forEach(section => observer.observe(section));
     return () => observer.disconnect();
   }, [stage, page]);
@@ -124,12 +136,18 @@ export default function Home() {
     ctx.fillStyle = "#f8eddd"; ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = "#b88443"; ctx.lineWidth = 5; ctx.strokeRect(48, 48, 1304, 1904);
     ctx.strokeStyle = "#ad7435"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(78,78); ctx.lineTo(365,78); ctx.moveTo(1035,78); ctx.lineTo(1322,78); ctx.moveTo(78,270); ctx.lineTo(78,1570); ctx.moveTo(1322,270); ctx.lineTo(1322,1570); ctx.moveTo(375,1922); ctx.lineTo(1025,1922); ctx.stroke();
-    const mandala = new Image(); mandala.src = "/gold-mandala-transparent.png";
-    try { await mandala.decode();
+    const mandala = new Image();
+    try {
+      await new Promise<void>((resolve, reject) => {
+        mandala.onload = () => resolve();
+        mandala.onerror = () => reject(new Error("Invitation ornament could not load."));
+        mandala.src = "/gold-mandala-transparent.png";
+      });
       ctx.save(); ctx.globalAlpha = .62; ctx.drawImage(mandala, 50, -400, 1300, 867); ctx.restore();
       const drawCorner = (x: number) => { ctx.save(); ctx.globalAlpha = .62; ctx.translate(x + 480, 1460 + 320); ctx.rotate(Math.PI); ctx.drawImage(mandala, -480, -320, 960, 640); ctx.restore(); };
       drawCorner(-330); drawCorner(770);
     } catch { /* Download remains available if the ornament cannot load. */ }
+    finally { mandala.onload = null; mandala.onerror = null; }
     ctx.textAlign = "center"; ctx.fillStyle = "#a16e35"; ctx.letterSpacing = "7px"; ctx.font = "700 33px Georgia"; ctx.fillText("TOGETHER WITH THEIR FAMILIES", center, 315);
     ctx.fillStyle = "#654536"; ctx.letterSpacing = "4px"; ctx.font = "40px Georgia"; ctx.fillText("MR & MRS MUNASINGHE", center, 390); ctx.fillStyle = "#b77b32"; ctx.font = "italic 32px Georgia"; ctx.fillText("and", center, 440); ctx.fillStyle = "#654536"; ctx.font = "40px Georgia"; ctx.fillText("MR & MRS ABEYWARNA", center, 490);
     ctx.font = "36px Georgia"; ctx.fillText("request the pleasure of your presence", center, 560);
@@ -158,14 +176,16 @@ export default function Home() {
     {stage === "book" && <section className={`booklet ${page === 0 ? "cover-view" : "continuous-view"}`} id="invitation">
       <header><button className="monogram" onClick={() => setPage(0)}>C<span> | </span>V</button><p>Our wedding invitation</p><span>11 · 12 · 2026</span></header>
       {page > 0 && <div className="scroll-ornaments" aria-hidden="true">{Array.from({length:12},(_,i)=><i key={i} style={{"--o":i} as React.CSSProperties}/>)}<b/><b/><b/></div>}
-      <div className="book-shell" onWheel={e => { if (page === 0 && e.deltaY > 30) setPage(1); }}><div className="page-stack">
-        <article className={`paper cover formal-cover ${page === 0 ? "active" : "left"}`} aria-hidden={page !== 0} inert={page !== 0}><button className="download-card" onClick={e => { e.stopPropagation(); void downloadInvitation(); }} aria-label="Download wedding invitation"><span>↓</span> Download</button><img className="mandala-art mandala-art-top" src="/gold-mandala-transparent.png" alt="" aria-hidden="true"/><img className="mandala-art mandala-art-left" src="/gold-mandala-transparent.png" alt="" aria-hidden="true"/><img className="mandala-art mandala-art-right" src="/gold-mandala-transparent.png" alt="" aria-hidden="true"/><div className="formal-copy revised-copy"><p className="families-title">Together with their families</p><p className="parents-list"><strong>MR &amp; MRS MUNASINGHE</strong><i>and</i><strong>MR &amp; MRS ABEYWARNA</strong></p><p className="request">request the pleasure of your presence</p><p className="occasion">as they celebrate the joyous occasion of the marriage of their beloved son and daughter</p><h5><span>Chathuranga</span><i>&amp;</i><span>Vinuri</span></h5><p className="formal-on">on</p><p className="formal-date-text">Friday, 11<sup>th</sup> December 2026</p><p className="formal-venue"><small>at</small>Grand Monarch<strong>Thalawathugoda - Tuscany Ballroom</strong></p><div className="formal-rsvp"><span>Chathuranga - 077 3671887</span><span>Vinuri - 077 3678601</span></div></div></article>
+      <div className="book-shell" onWheel={e => { if (page === 0 && coverCueVisible.current && !e.ctrlKey && e.deltaY > 30) openCelebration(); }}><div className="page-stack">
+        <article className={`paper cover formal-cover ${page === 0 ? "active" : "left"}`} aria-hidden={page !== 0} inert={page !== 0}><button className="download-card" onClick={e => { e.stopPropagation(); void downloadInvitation(); }} aria-label="Download wedding invitation"><span>↓</span> Download</button><img className="mandala-art mandala-art-top" src="/gold-mandala-transparent.png" width={1536} height={1024} decoding="async" alt="" aria-hidden="true"/><img className="mandala-art mandala-art-left" src="/gold-mandala-transparent.png" width={1536} height={1024} decoding="async" alt="" aria-hidden="true"/><img className="mandala-art mandala-art-right" src="/gold-mandala-transparent.png" width={1536} height={1024} decoding="async" alt="" aria-hidden="true"/><div className="formal-copy revised-copy"><p className="families-title">Together with their families</p><p className="parents-list"><strong>MR &amp; MRS MUNASINGHE</strong><i>and</i><strong>MR &amp; MRS ABEYWARNA</strong></p><p className="request">request the pleasure of your presence</p><p className="occasion">as they celebrate the joyous occasion of the marriage of their beloved son and daughter</p><h5><span>Chathuranga</span><i>&amp;</i><span>Vinuri</span></h5><p className="formal-on">on</p><p className="formal-date-text">Friday, 11<sup>th</sup> December 2026</p><p className="formal-venue"><small>at</small>Grand Monarch<strong>Thalawathugoda - Tuscany Ballroom</strong></p><div className="formal-rsvp"><span>Chathuranga - 077 3671887</span><span>Vinuri - 077 3678601</span></div></div></article>
+        {celebrationLoaded && <>
         <article className="paper details scroll-section" aria-hidden={page === 0} inert={page === 0}><div className="page-number">02</div><div className="ceremony-heading"><p className="kicker">A treasured Sri Lankan tradition</p><h2>Poruwa Ceremony</h2><div aria-hidden="true"><i/>◆<i/></div></div><div className="editorial-image ceremony-image" role="img" aria-label="Bride and groom during the Poruwa ceremony"/><div className="page-copy"><p className="kicker">The wedding ceremony</p><h2>When two families become one.</h2><p>With the blessings of our parents, we invite you to witness our union in a traditional Sri Lankan Poruwa ceremony.</p><dl><div><dt>Date</dt><dd>Friday, 11 December 2026</dd></div><div><dt>Time</dt><dd>10.10 in the morning</dd></div><div><dt>Venue</dt><dd>Grand Monarch, Thalawathugoda</dd></div></dl><div className="details-countdown"><p className="kicker">Until we say “I do”</p><Countdown /></div></div></article>
         <article className="paper agenda scroll-section" aria-hidden={page === 0} inert={page === 0}><div className="agenda-petals" aria-hidden="true"><i/><i/><i/></div><div className="page-number">03</div><div className="page-title"><p className="kicker">A day to remember</p><h2>Our celebration</h2><p>Every moment, lovingly planned.</p></div><div className="agenda-schedule"><div className="timeline">{agenda.map(([time, title], i) => <div key={`${time}-${title}`} style={{"--delay": `${i * 90}ms`} as React.CSSProperties}><time>{time}</time><i /><strong>{title}</strong></div>)}</div><section className="date-calendar" aria-label="December 2026 wedding calendar"><div className="calendar-heading"><p><small>Save the date</small><strong>December</strong></p><b>2026</b></div><div className="calendar-week">{["S","M","T","W","T","F","S"].map((day,i)=><span key={`${day}-${i}`}>{day}</span>)}</div><div className="calendar-days">{[...Array(2).fill(null),...Array.from({length:31},(_,i)=>i+1)].map((day,i)=><span key={i} className={day===11?"wedding-day":day?"":"empty"}>{day}</span>)}</div><div className="calendar-branch" aria-hidden="true"><i/><i/><i/><i/><i/></div></section><a className="calendar-save" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Chathuranga%20%26%20Vinuri%20Wedding&dates=20261211T033000Z%2F20261211T090000Z&details=Join%20us%20for%20our%20wedding%20celebration.&location=Grand%20Monarch%2C%20Thalawathugoda" target="_blank" rel="noreferrer" aria-label="Save the wedding date to Google Calendar"><span aria-hidden="true">11</span><b>Save the date</b><i aria-hidden="true">↗</i></a></div></article>
         <article className="paper location scroll-section" aria-hidden={page === 0} inert={page === 0}><div className="venue-orbit" aria-hidden="true"><i/><i/><i/></div><div className="page-number">04</div><div className="venue-heading"><p className="kicker">The wedding venue</p><h2>Where our forever begins.</h2><span aria-hidden="true">◆</span></div><div className="map-wrap"><div className="map-pin" aria-hidden="true"><i>⌖</i></div><iframe title="Map to Grand Monarch Thalawathugoda" loading="lazy" referrerPolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Grand+Monarch+Thalawathugoda&output=embed" /></div><div className="location-copy"><p className="kicker">Meet us in Thalawathugoda</p><h2>Grand Monarch</h2><p>Thalawathugoda<br/>Sri Lanka</p><a className="gold-button" href="https://maps.google.com/?q=Grand+Monarch+Thalawathugoda" target="_blank" rel="noreferrer">Get directions <span>↗</span></a></div></article>
         <article className="paper rsvp scroll-section" aria-hidden={page === 0} inert={page === 0}><div className="page-number">05</div><div className="rsvp-page-title"><p className="kicker">WITH LOVE AND GRATITUDE</p><h2>RSVP</h2><div aria-hidden="true"><i/>◆<i/></div></div><div className="rsvp-intro"><h2>Will you be joining us?</h2><p>Your presence would mean the world to us. Kindly reply by 1 December 2026.</p></div><Rsvp /><div className="rsvp-finale"><div className="finale-rings" aria-hidden="true"><i/><i/><b>♥</b></div><p>With love, we await your reply</p><strong>Chathuranga <br/><i>&amp;</i><br/> Vinuri</strong><small>Until our beautiful beginning</small></div><button className="back-to-card" onClick={() => { setPage(0); window.scrollTo({top:0,behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth"}); }}><span>←</span><b>Back to wedding card</b></button></article>
+        </>}
       </div></div>
-      {page === 0 && <button className="scroll-next" onClick={() => setPage(1)}><span>Discover the celebration</span><i>↓</i></button>}
+      {page === 0 && <button className="scroll-next" onClick={openCelebration}><span>Discover the celebration</span><i>↓</i></button>}
     </section>}
   </main>;
 }
