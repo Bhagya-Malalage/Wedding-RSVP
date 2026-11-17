@@ -63,12 +63,12 @@
 @media(max-width:420px){.letter .letter-invite{font-size:38px}.save-card{padding-inline:26px}}
 
 /* Standalone invitation cover */
-.cover-view{padding-top:12px}.cover-view header{height:0;opacity:0;pointer-events:none}.cover-view .book-shell{width:min(720px,100%);height:calc(100svh - 104px);min-height:610px;margin-top:0}.cover-view .page-stack{filter:drop-shadow(0 30px 45px #1d100b99)}
-.download-card{position:absolute!important;z-index:9!important;top:auto!important;right:25px;bottom:24px;height:auto!important;min-height:0;display:flex;align-items:center;gap:8px;border:1px solid #9d6b394d;border-radius:30px;padding:9px 14px;background:#fffaf0dc;color:#6d462e;box-shadow:0 8px 22px #5c38201f;backdrop-filter:blur(8px);cursor:pointer;font:800 8px Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase;transition:.25s}.download-card span{display:grid;place-items:center;width:23px;height:23px;border-radius:50%;background:#795039;color:#fff5e7;font:14px Arial}.download-card:hover{transform:translateY(-2px);background:#fffaf2;box-shadow:0 12px 28px #5c38202d}
+.cover-view{padding-top:12px}.cover-view header{height:0;opacity:0;pointer-events:none}.cover-view .page-stack{filter:drop-shadow(0 30px 45px #1d100b99)}
+.download-card{position:absolute!important;z-index:9!important;top:auto!important;right:25px;bottom:24px;height:auto!important;min-height:0;display:flex;align-items:center;gap:8px;border:1px solid #9d6b394d;border-radius:30px;padding:9px 14px;background:#fffaf0dc;color:#6d462e;box-shadow:0 8px 22px #5c38201f;backdrop-filter:blur(8px);cursor:pointer;font:800 8px Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase;transition:transform .25s,background .25s,box-shadow .25s}.download-card span{display:grid;place-items:center;width:23px;height:23px;border-radius:50%;background:#795039;color:#fff5e7;font:14px Arial}.download-card:hover{transform:translateY(-2px);background:#fffaf2;box-shadow:0 12px 28px #5c38202d}
 .scroll-next{display:flex;flex-direction:column;align-items:center;gap:2px;margin:8px auto 0;border:0;background:none;color:#f0d5b2;cursor:pointer}.scroll-next span{font:700 7px Arial,sans-serif;letter-spacing:.24em;text-transform:uppercase}.scroll-next i{font:400 25px Georgia,serif;animation:arrowDown 1.55s ease-in-out infinite}.cover-view .cover{background:radial-gradient(circle at 50% 43%,#fffaf6 0 27%,#f2dfc2 70%,#d9b27c 100%)}.cover-view .cover:after{inset:16px;border-color:#b9813b70;box-shadow:inset 0 0 0 1px #fff8}
 @keyframes arrowDown{0%,100%{transform:translateY(0);opacity:.45}50%{transform:translateY(8px);opacity:1}}
-@media(min-width:761px) and (max-width:1024px){.envelope-scene{transform:translateY(-48px)}.tap-copy{top:calc(50% + 198px)}.tap-copy span{font-size:9px}.cover-view .book-shell{width:min(680px,94%);height:calc(100svh - 100px)}}
-@media(max-width:760px){.cover-view{padding:7px}.cover-view .book-shell{height:calc(100svh - 84px);min-height:560px}.download-card{top:22px;right:20px;padding:7px 10px;font-size:7px}.download-card span{width:21px;height:21px}.scroll-next{margin-top:5px}.cover-view .cover{padding-top:68px}.cover-view .cover h1{font-size:clamp(47px,15vw,64px)}}
+@media(min-width:761px) and (max-width:1024px){.envelope-scene{transform:translateY(-48px)}.tap-copy{top:calc(50% + 198px)}.tap-copy span{font-size:9px}}
+@media(max-width:760px){.cover-view{padding:7px}.download-card{top:22px;right:20px;padding:7px 10px;font-size:7px}.download-card span{width:21px;height:21px}.scroll-next{margin-top:5px}.cover-view .cover{padding-top:68px}.cover-view .cover h1{font-size:clamp(47px,15vw,64px)}}
 
 /* Formal Sri Lankan invitation layout */
 .cover-view .formal-cover{overflow:hidden;padding:clamp(72px,8vh,105px) clamp(42px,8vw,95px) 42px;background:linear-gradient(135deg,#fffdf8,#f8eddd 52%,#f0dcc0)}
@@ -106,7 +106,7 @@ body{overflow-x:hidden}
 .paper{overscroll-behavior:contain}
 .cover-view{display:flex;min-height:100vh;min-height:100svh;flex-direction:column;align-items:center;padding:8px 10px 6px}
 .cover-view header{display:none}
-.cover-view .book-shell{flex:1 1 auto;width:min(720px,calc(100vw - 20px));height:auto;min-height:0;margin:0;aspect-ratio:720/900;max-height:calc(100svh - 55px)}
+
 .cover-view .formal-cover{padding:clamp(92px,15vh,142px) clamp(24px,7vw,72px) clamp(58px,8vh,74px)}
 .formal-copy{min-height:0}
 .scroll-next{flex:0 0 42px;margin:2px auto 0}
@@ -128,7 +128,7 @@ body{overflow-x:hidden}
   .booklet{padding:16px 20px}
   .book-shell{width:min(760px,100%)}
   .paper{padding:clamp(42px,6vw,66px)}
-  .cover-view .book-shell{width:min(690px,calc(100vw - 40px));max-height:calc(100svh - 58px)}
+
   .cover-view .formal-cover{padding-top:clamp(110px,16vh,145px)}
   .download-card{right:20px;bottom:18px}
   .book-nav{margin-top:14px}
@@ -149,7 +149,7 @@ body{overflow-x:hidden}
   .book-shell{height:calc(100svh - 112px);min-height:0;margin-top:5px}
   .paper{padding:45px 22px 30px}
   .cover-view{padding:5px}
-  .cover-view .book-shell{width:min(calc(100vw - 10px),calc((100svh - 48px) * .72));height:auto;max-height:calc(100svh - 48px);aspect-ratio:720/900}
+
   .cover-view .formal-cover{padding:clamp(82px,14vh,112px) 20px clamp(54px,8vh,68px)}
   .formal-cover h1{font-size:clamp(39px,12vw,53px)!important}
   .parents{font-size:clamp(8.5px,2.8vw,11px)}
@@ -202,7 +202,7 @@ body{overflow-x:hidden}
 @media (max-height:600px) and (orientation:landscape){
   .envelope-scene{width:min(55vw,420px);transform:translateY(-22px)}
   .tap-copy{top:auto;bottom:18px}
-  .cover-view .book-shell{width:min(430px,65vw);max-height:calc(100svh - 44px)}
+
   .formal-copy{transform:scale(.76)}
   .book-shell{height:calc(100svh - 98px)}
   .details,.agenda,.location,.rsvp{grid-template-columns:1fr 1fr;gap:28px}
@@ -225,7 +225,7 @@ body{overflow-x:hidden}
 .scroll-next{position:relative;z-index:8;color:#f3d7b2}
 
 @media (max-width:600px){
-  .cover-view .book-shell{max-height:calc(100svh - 58px)}
+
   .scroll-next{display:flex;flex-basis:42px;margin-top:1px}
   .scroll-next span{font-size:6px;letter-spacing:.2em}
   .scroll-next i{font-size:22px}
@@ -671,7 +671,7 @@ html:has(.continuous-view),body:has(.continuous-view){
 .continuous-view header p{position:relative;z-index:1;margin:0;color:#e7c9a2;font:700 7px Arial,sans-serif;letter-spacing:.26em;white-space:nowrap}
 .continuous-view header>span{position:relative;z-index:1;color:#e7c9a2;font:700 7px Arial,sans-serif;letter-spacing:.2em;white-space:nowrap}
 @keyframes invitationBarIn{from{opacity:0;transform:translateY(-14px) scale(.97)}to{opacity:1;transform:none}}
-@keyframes headerGleam{0%,62%{left:-22%;opacity:0}68%{opacity:1}84%,100%{left:115%;opacity:0}}
+@keyframes headerGleam{0%,62%{transform:translateX(0) rotate(20deg);opacity:0}68%{opacity:1}84%,100%{transform:translateX(980%) rotate(20deg);opacity:0}}
 
 @media(max-width:600px){
   .continuous-view{padding-top:4px}
@@ -1497,13 +1497,7 @@ html,body{
   .experience .formal-cover h5 i{width:72%;font-size:16px!important}
 }
 
-/* Reduce excess space above the invitation copy below wide-desktop size */
-@media(max-width:1439px){
-  .cover-view .revised-copy{top:clamp(-38px,-4vh,-18px)}
-}
-@media(max-width:600px){
-  .cover-view .revised-copy{top:clamp(-32px,-3.5vh,-20px)}
-}
+
 
 /* Bring the next continuous section into view sooner on compact screens */
 .continuous-view .scroll-section{
@@ -1857,3 +1851,39 @@ body{overflow-x:clip;overflow-y:visible}
 @media(prefers-reduced-motion:reduce){
   .continuous-view .paper{opacity:1;transform:none;transition:none!important}
 }
+
+/* Content-sized invitation: one sizing path for WebKit and Chromium. */
+
+.cover-view{--cover-viewport:100vh;--cover-top:8px;--cover-bottom:6px;--cover-cue:48px;min-height:var(--cover-viewport);padding-top:max(var(--cover-top),env(safe-area-inset-top));padding-bottom:max(var(--cover-bottom),env(safe-area-inset-bottom));}
+@supports(height:100svh){.cover-view{--cover-viewport:100svh}}
+@supports(height:100dvh){.cover-view{--cover-viewport:100dvh}}
+.cover-view .book-shell{width:min(720px,100%);margin:0;position:relative;display:grid;flex:0 0 auto;height:auto;min-height:calc(var(--cover-viewport) - max(var(--cover-top),env(safe-area-inset-top)) - max(var(--cover-bottom),env(safe-area-inset-bottom)) - var(--cover-cue));max-height:none;aspect-ratio:auto}
+.cover-view .page-stack{display:grid;height:auto;min-height:0;align-self:stretch}
+.cover-view .formal-cover{position:relative;inset:auto;display:grid;place-items:center;width:100%;height:auto;min-height:0;align-self:stretch;}
+.cover-view .formal-copy{height:auto;top:auto;align-self:center;transform:none;}
+.cover-view .formal-copy>*{flex-shrink:0}
+.cover-view .scroll-next{flex:0 0 auto;min-height:42px;margin:2px auto 0}
+@media(max-width:600px){.cover-view{--cover-top:5px;--cover-bottom:5px}.cover-view .book-shell{width:calc(100vw - 10px)}}
+
+@media(min-width:601px) and (max-width:1100px){.cover-view .book-shell{width:min(690px,calc(100vw - 40px))}}
+@media(max-height:600px) and (orientation:landscape){.cover-view .book-shell{width:min(430px,65vw)}}
+.mandala-art{height:auto;aspect-ratio:3/2}
+.book-shell,.experience.stage-book,.booklet.continuous-view,.continuous-view .book-shell,.continuous-view .page-stack,.continuous-view .scroll-section{touch-action:auto}
+.music{bottom:calc(22px + env(safe-area-inset-bottom));right:calc(22px + env(safe-area-inset-right))}
+@media(max-width:760px){.music{bottom:calc(13px + env(safe-area-inset-bottom));right:calc(13px + env(safe-area-inset-right))}}
+
+/* Retain revealed content while pausing decorative work outside the viewport. */
+.continuous-view .scroll-section:not(.motion-visible),
+.continuous-view .scroll-section:not(.motion-visible) *,
+.continuous-view .scroll-section:not(.motion-visible)::before,
+.continuous-view .scroll-section:not(.motion-visible)::after,
+.continuous-view .scroll-section:not(.motion-visible) *::before,
+.continuous-view .scroll-section:not(.motion-visible) *::after{animation-play-state:paused!important}
+
+/* Keep the existing download control clear of copy on short screens. */
+@media(max-height:720px){.cover-view .formal-cover{padding-bottom:58px}}
+
+/* Only the revealed save-date card participates in intro sizing. */
+.stage-card .envelope-scene{position:relative;grid-area:2/1}
+.stage-card .save-card{position:relative;margin:16px auto;grid-area:1/1/3/2}
+.stage-card .particles{position:static;inset:auto;pointer-events:none;grid-area:1/1}
